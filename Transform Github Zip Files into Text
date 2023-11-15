@@ -1,1 +1,80 @@
+# Function to merge files from a given directory with a specified file extension into a single output file.
+merge_files <- function(directory, file_extension, output_file_name) {
+  # Set the working directory 
+  setwd(directory)
+  
+  # List all files with the specified extension
+  files <- list.files(pattern = paste0("\\", file_extension, "$"))
+  
+  # Specify the output file name
+  output_file <- output_file_name
+  
+  # Start merging process
+  for (file in files) {
+    # Read the contents of the file
+    lines <- readLines(file)
+    
+    # Check if there's an incomplete line at the end of the file
+    if (length(lines) == 0 || nchar(tail(lines, n = 1)) > 0) {
+    lines <- c(lines, "")
+  }
+
+    
+    # Write the contents to the output file, appending each time
+    write(lines, output_file, append = TRUE)
+  }
+  
+  # Report completion
+  cat("Merged files from", directory, "with extension", file_extension, "into", output_file, "\n")
+}
+
+# Example usage:
+# merge_files("C:/Users/user/Downloads/Test/file/R", ".R", "Merged_R_Files.txt")
+
+###################################################################################
+### Applied over a large amount of files ###
+# List of directories, file extensions, and output file names
+# You may need to reverse the backslash to a forward slash
+# R is weird about backslashes
+input_parameters <- list(
+  list("C:/Users/user/Downloads/Folder/file/man", ".Rd", "packageman.Rd"),
+  list("C:/Users/user/Downloads/Folder/file/R", ".R", "packageFunctions.R"),
+  list("C:/Users/user/Downloads/Folder/file/inst/test", ".R", "packageTests.R")
+)
+
+# Loop through each set of parameters and call the merge_files function
+for (params in input_parameters) {
+  do.call("merge_files", params)
+}
+
+# Merge the merged files into one
+setwd("C:/Users/user/Downloads/Merged_files")
+
+# List all files
+files <- list.files()
+
+# Create or open the output .txt file
+output_file <- "alltogether.txt"
+sink(output_file)
+
+# I plan on making this into a function later
+# Loop through each file
+for (file in files) {
+  # Depending on the file type, you might want to handle it differently
+  if (grepl("\\.R$", file) || grepl("\\.md$", file) || grepl("\\.txt$", file)) {
+    cat(paste0("\n\n### ", toupper(file), " ###\n\n")) # Add a header for the file
+    writeLines(readLines(file))
+  } else if (grepl("\\.Rd$", file)) {
+    # For .Rd files, you might need to parse the LaTeX or just include them as is
+    cat(paste0("\n\n### ", toupper(file), " ###\n\n")) # Add a header for the file
+    writeLines(readLines(file))
+  } else {
+    # For other file types, handle them or skip them
+    # Will update later
+    next
+  }
+}
+
+# Close the connection
+sink()
 
