@@ -1,3 +1,4 @@
+# This is useful for training custom GPTs, as they cannot handle zip files efficiently
 # Function to merge files from a given directory with a specified file extension into a single output file.
 merge_files <- function(directory, file_extension, output_file_name) {
   # Set the working directory 
